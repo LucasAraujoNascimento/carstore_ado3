@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CarStore — Catálogo público</title>
+    <style>
+        :root{
+          --bg:#080d1a;
+          --surface:#0e152c;
+          --surface-2:#0b1226;
+          --border:#1f2a4a;
+          --text:#e9edf6;
+          --muted:#98a2b3;
+          --primary:#22d3ee;
+          --primary-600:#06b6d4;
+          --chip:#0a1329;
+          --shadow: 0 10px 24px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+          --focus: 0 0 0 3px rgba(34,211,238,.35);
+          --radius:16px;
+        }
+
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+          margin:0;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+          color:var(--text);
+          background:
+            radial-gradient(900px 500px at 10% -10%, rgba(34,211,238,.25), transparent 60%),
+            radial-gradient(900px 500px at 110% 0%, rgba(99,102,241,.25), transparent 60%),
+            var(--bg);
+        }
+
+        .hero{
+          padding:48px 20px 28px;
+          border-bottom:1px solid var(--border);
+          background:linear-gradient(180deg, rgba(14,21,44,.8), rgba(14,21,44,.4));
+          backdrop-filter:blur(6px) saturate(1.1);
+        }
+        .hero-inner{max-width:1100px; margin:0 auto; display:flex; align-items:center; gap:24px; justify-content:space-between; flex-wrap:wrap}
+        .brand{
+          display:flex; align-items:center; gap:14px;
+        }
+        .logo{
+          width:42px; height:42px; border-radius:12px;
+          background:conic-gradient(from 90deg, #22d3ee, #6366f1, #22c55e, #22d3ee);
+          box-shadow:0 8px 22px rgba(34,211,238,.4);
+        }
+        h1{margin:0; font-size:26px; letter-spacing:.2px}
+        .sub{margin:6px 0 0; color:var(--muted); font-size:14px}
+
+        .search{
+          display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+          background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:10px 12px;
+          box-shadow:var(--shadow);
+        }
+        .search input[type="text"]{
+          border:none; outline:none; background:transparent; color:var(--text);
+          padding:6px 10px; min-width:220px; width:260px;
+        }
+        .search input::placeholder{color:#74809a}
+        .search .btn{
+          appearance:none; border:1px solid transparent; cursor:pointer;
+          padding:10px 14px; border-radius:999px; font-weight:700; font-size:14px;
+          background:linear-gradient(180deg, var(--primary), var(--primary-600)); color:#041018;
+          box-shadow:0 6px 18px rgba(6,182,212,.35);
+        }
+        .hero-links{margin-top:8px}
+        .hero-links a{color:var(--muted); text-decoration:none; font-size:14px}
+        .hero-links a:hover{color:var(--text)}
+
+        .section{
+          max-width:1100px; margin:26px auto 48px; padding:0 20px;
+        }
+        .muted{color:var(--muted)}
+
+        .grid{
+          display:grid; gap:16px;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        }
+        .card{
+          background:linear-gradient(180deg, var(--surface), var(--surface-2));
+          border:1px solid var(--border);
+          border-radius:var(--radius);
+          padding:18px;
+          box-shadow:var(--shadow);
+          transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+        .card:hover{
+          transform: translateY(-3px);
+          border-color:#2b3a66;
+          box-shadow: 0 14px 30px rgba(34,211,238,.08), inset 0 1px 0 rgba(255,255,255,.06);
+        }
+        .card h3{margin:0 0 10px; font-size:18px}
+        .badge{
+          display:inline-flex; align-items:center; gap:8px;
+          padding:6px 10px; border-radius:999px; background:var(--chip); border:1px solid var(--border);
+          color:#cfe9ff; font-weight:600; font-size:12px;
+        }
+        .dot{width:10px; height:10px; border-radius:50%; background:linear-gradient(180deg, #38bdf8, #2563eb)}
+        .id{margin-top:10px; font-size:12px; color:#9fb0c8}
+    </style>
+</head>
+<body>
+<header class="hero">
+    <div class="hero-inner">
+        <div>
+            <div class="brand">
+                <div class="logo" aria-hidden="true"></div>
+                <div>
+                    <h1>Catálogo público</h1>
+                    <p class="sub">Explore os carros disponíveis. Para gerenciar, acesse a área administrativa.</p>
+                </div>
+            </div>
+            <div class="hero-links">
+                <a href="/admin/cars" title="Ir para a administração">/admin/cars</a>
+            </div>
+        </div>
+
+        <form class="search" method="get" action="/">
+            <input name="q" th:value="${q}" placeholder="Buscar por nome ou cor..." />
+            <button class="btn" type="submit">Buscar</button>
+        </form>
+    </div>
+</header>
+
+<section class="section">
+    <p class="muted" th:if="${q}">Resultados para: <strong th:text="${q}">consulta</strong></p>
+
+    <div class="grid">
+        <div class="card" th:each="c : ${cars}">
+            <h3 th:text="${c.name}">Nome do carro</h3>
+            <span class="badge">
+          <span class="dot" aria-hidden="true"></span>
+          <span th:text="${c.color}">Cor</span>
+        </span>
+            <p class="id" th:text="'ID: ' + ${c.id}">ID: 1</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

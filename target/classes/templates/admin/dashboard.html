@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>CarStore — Administração</title>
+    <style>
+        :root{
+          --bg: #0b1020;
+          --surface: #121933;
+          --surface-2:#0f152b;
+          --border: #243157;
+          --text:#e6e9f2;
+          --muted:#9aa3b2;
+          --primary:#3b82f6;
+          --primary-600:#2563eb;
+          --success:#22c55e;
+          --warning:#f59e0b;
+          --danger:#ef4444;
+          --card-radius:14px;
+          --shadow: 0 8px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.03);
+          --focus: 0 0 0 3px rgba(59,130,246,.35);
+        }
+
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        body{
+          margin:0;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+          color:var(--text);
+          background:
+            radial-gradient(1200px 600px at 120% -10%, rgba(59,130,246,.25), transparent 60%),
+            radial-gradient(900px 500px at -20% 0%, rgba(99,102,241,.25), transparent 60%),
+            var(--bg);
+        }
+
+        .admin-shell{
+          min-height:100%;
+          display:flex;
+          flex-direction:column;
+        }
+
+        .topbar{
+          position:sticky; top:0; z-index:10;
+          backdrop-filter:saturate(1.2) blur(8px);
+          background:linear-gradient(180deg, rgba(18,25,51,.9), rgba(18,25,51,.6));
+          border-bottom:1px solid var(--border);
+        }
+        .topbar-inner{
+          max-width:1100px; margin:0 auto; padding:14px 20px;
+          display:flex; align-items:center; justify-content:space-between; gap:12px;
+        }
+        .brand{
+          display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.3px;
+        }
+        .brand .dot{
+          width:12px; height:12px; border-radius:50%;
+          background:conic-gradient(from 180deg, var(--primary), #22c55e, #a855f7, var(--primary));
+          box-shadow:0 0 12px rgba(59,130,246,.8);
+        }
+        .link{
+          color:var(--muted); text-decoration:none; font-size:14px;
+        }
+        .link:hover{color:var(--text)}
+
+        .content{
+          max-width:1100px; margin:28px auto; padding:0 20px 40px;
+          display:grid; grid-template-columns: 360px 1fr; gap:22px;
+        }
+        @media (max-width: 960px){
+          .content{grid-template-columns: 1fr; gap:18px}
+        }
+
+        .panel{
+          background:linear-gradient(180deg, var(--surface), var(--surface-2));
+          border:1px solid var(--border);
+          border-radius:var(--card-radius);
+          box-shadow:var(--shadow);
+        }
+        .panel-header{
+          padding:16px 18px; border-bottom:1px solid var(--border);
+          display:flex; align-items:center; justify-content:space-between; gap:12px;
+        }
+        .panel-title{margin:0; font-size:16px; font-weight:700}
+        .panel-sub{margin:0; color:var(--muted); font-size:13px}
+
+        .panel-body{padding:18px}
+
+        .muted{color:var(--muted)}
+
+        .field{display:flex; flex-direction:column; gap:8px}
+        .field + .field{margin-top:14px}
+        .label{font-size:12px; color:var(--muted)}
+        input[type="text"]{
+          width:100%; padding:12px 12px;
+          color:var(--text);
+          background:#0c1329;
+          border:1px solid var(--border);
+          border-radius:10px;
+          outline:none; transition:.15s border-color, .15s box-shadow;
+        }
+        input[type="text"]::placeholder{color:#6c7891}
+        input[type="text"]:focus{border-color:var(--primary); box-shadow:var(--focus)}
+
+        .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+        .btn{
+          appearance:none; border:1px solid transparent; cursor:pointer;
+          padding:10px 14px; border-radius:10px; font-weight:600; font-size:14px;
+          transition:transform .06s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+        }
+        .btn:active{transform:translateY(1px)}
+        .btn-primary{
+          background:linear-gradient(180deg, var(--primary), var(--primary-600));
+          color:white; box-shadow:0 6px 16px rgba(37,99,235,.35);
+        }
+        .btn-primary:hover{filter:saturate(1.05) brightness(1.02)}
+        .btn-warning{
+          background:linear-gradient(180deg, #fbbf24, var(--warning));
+          color:#1b1305; box-shadow:0 6px 16px rgba(245,158,11,.35);
+        }
+        .btn-danger{
+          background:linear-gradient(180deg, #f87171, var(--danger));
+          color:#2b0b0b; box-shadow:0 6px 16px rgba(239,68,68,.35);
+        }
+        .btn-ghost{
+          background:transparent; color:var(--text); border-color:var(--border);
+        }
+        .hint{font-size:12px; color:#fca5a5; margin-top:6px}
+
+        .table-wrap{
+          width:100%; overflow:auto; border-top-left-radius:0; border-top-right-radius:0;
+        }
+        table{
+          width:100%; border-collapse:separate; border-spacing:0;
+          min-width:720px;
+        }
+        thead th{
+          position:sticky; top:0; background:rgba(9,14,32,.6);
+          backdrop-filter:blur(6px);
+          color:#c7d2fe; font-weight:700; font-size:13px; letter-spacing:.3px;
+          text-align:left; padding:12px 14px; border-bottom:1px solid var(--border);
+        }
+        tbody td{
+          padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle;
+        }
+        tbody tr:hover{background:rgba(59,130,246,.06)}
+
+        .inline{display:inline}
+        .row-controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+        .chip{
+          display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px;
+          background:#0c1329; border:1px solid var(--border); color:#cfe0ff; font-size:12px;
+        }
+        .dot-sm{width:8px;height:8px;border-radius:50%}
+        .dot-blue{background:#60a5fa}
+        .dot-gray{background:#94a3b8}
+
+        .footer{
+          max-width:1100px; margin:18px auto 40px; padding:0 20px;
+          color:var(--muted); font-size:13px;
+        }
+        code{
+          background:#0c1329; border:1px solid var(--border); padding:2px 6px; border-radius:6px; color:#cfe0ff;
+        }
+    </style>
+</head>
+<body>
+<div class="admin-shell">
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="dot" aria-hidden="true"></span>
+                <span>CarStore Admin</span>
+            </div>
+            <a class="link" href="/" title="Ir para o catálogo público">Catálogo público</a>
+        </div>
+    </header>
+
+    <main class="content">
+        <!-- Painel: Novo carro -->
+        <section class="panel">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Cadastrar novo carro</h2>
+                    <p class="panel-sub">Insira as informações e salve para adicionar ao catálogo.</p>
+                </div>
+            </div>
+            <div class="panel-body">
+                <form th:action="@{/admin/cars}" method="post" th:object="${form}">
+                    <div class="field">
+                        <label class="label" for="name">Nome do modelo</label>
+                        <input id="name" th:field="*{name}" placeholder="Ex.: Civic, Gol, Uno..." />
+                        <div class="hint" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="color">Cor</label>
+                        <input id="color" th:field="*{color}" placeholder="Ex.: Prata, Preto, Azul..." />
+                        <div class="hint" th:if="${#fields.hasErrors('color')}" th:errors="*{color}"></div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">Salvar carro</button>
+                        <button class="btn btn-ghost" type="reset">Limpar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Painel: Lista -->
+        <section class="panel" style="overflow:hidden">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Inventário de carros</h2>
+                    <p class="panel-sub">Gerencie os registros existentes.</p>
+                </div>
+                <span class="chip"><span class="dot-sm dot-blue"></span> Total: <span th:text="${#lists.size(cars)}">0</span></span>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width:90px">ID</th>
+                        <th>Nome</th>
+                        <th style="width:220px">Cor</th>
+                        <th style="width:280px">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${cars}">
+                        <td>
+                            <span class="chip"><span class="dot-sm dot-gray"></span><span th:text="${c.id}">1</span></span>
+                        </td>
+                        <td>
+                            <form class="inline" th:action="@{/admin/cars/{id}/update(id=${c.id})}" method="post">
+                                <input type="text" name="name" th:value="${c.name}" placeholder="Nome do carro" />
+                        </td>
+                        <td>
+                            <input type="text" name="color" th:value="${c.color}" placeholder="Cor" />
+                        </td>
+                        <td>
+                            <div class="row-controls">
+                                <button class="btn btn-warning" type="submit" title="Atualizar registro">Atualizar</button>
+                            </div>
+                            </form>
+                            <form class="inline" th:action="@{/admin/cars/{id}/delete(id=${c.id})}" method="post" onsubmit="return confirm('Confirmar exclusão?');" style="margin-left:8px">
+                                <button class="btn btn-danger" type="submit" title="Excluir registro">Excluir</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</div>
+</body>
+</html>
