@@ -3,6 +3,7 @@ package br.com.carstore.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class CourseEntity {
     @Size(min = 10, max = 500, message = "A descrição deve ter entre 10 e 500 caracteres")
     private String description;
 
+    @NotNull(message = "A duração em horas é obrigatória")
     @Min(value = 1, message = "A duração deve ser no mínimo 1 hora")
     private Integer durationHours;
 
