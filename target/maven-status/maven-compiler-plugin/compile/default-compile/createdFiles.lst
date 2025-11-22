@@ -1,0 +1,8 @@
+br/com/carstore/dao/CarJpaDao.class
+br/com/carstore/service/CarServiceImpl.class
+br/com/carstore/controller/PublicController.class
+br/com/carstore/model/CarDTO.class
+br/com/carstore/entity/CarEntity.class
+br/com/carstore/controller/AdminController.class
+br/com/carstore/CarstoreApplication.class
+br/com/carstore/service/CarService.class
