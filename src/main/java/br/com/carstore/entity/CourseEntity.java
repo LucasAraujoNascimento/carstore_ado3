@@ -1,0 +1,58 @@
+package br.com.carstore.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "course")
+public class CourseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "O título do curso é obrigatório")
+    @Size(min = 3, max = 100, message = "O título deve ter entre 3 e 100 caracteres")
+    private String title;
+
+    @NotBlank(message = "A descrição do curso é obrigatória")
+    @Size(min = 10, max = 500, message = "A descrição deve ter entre 10 e 500 caracteres")
+    private String description;
+
+    @Min(value = 1, message = "A duração deve ser no mínimo 1 hora")
+    private Integer durationHours;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    public CourseEntity() {}
+
+    public CourseEntity(String title, String description, Integer durationHours) {
+        this.title = title;
+        this.description = description;
+        this.durationHours = durationHours;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    
+    public Integer getDurationHours() { return durationHours; }
+    public void setDurationHours(Integer durationHours) { this.durationHours = durationHours; }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CarStore — Catálogo público</title>
+    <title>Catálogo de Cursos</title>
     <style>
         :root{
           --bg:#080d1a;
@@ -66,7 +66,7 @@
           background:linear-gradient(180deg, var(--primary), var(--primary-600)); color:#041018;
           box-shadow:0 6px 18px rgba(6,182,212,.35);
         }
-        .hero-links{margin-top:8px}
+        .hero-links{margin-top:8px; display:flex; gap:16px}
         .hero-links a{color:var(--muted); text-decoration:none; font-size:14px}
         .hero-links a:hover{color:var(--text)}
 
@@ -76,14 +76,14 @@
         .muted{color:var(--muted)}
 
         .grid{
-          display:grid; gap:16px;
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          display:grid; gap:18px;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         }
         .card{
           background:linear-gradient(180deg, var(--surface), var(--surface-2));
           border:1px solid var(--border);
           border-radius:var(--radius);
-          padding:18px;
+          padding:20px;
           box-shadow:var(--shadow);
           transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
         }
@@ -92,14 +92,15 @@
           border-color:#2b3a66;
           box-shadow: 0 14px 30px rgba(34,211,238,.08), inset 0 1px 0 rgba(255,255,255,.06);
         }
-        .card h3{margin:0 0 10px; font-size:18px}
+        .card h3{margin:0 0 12px; font-size:20px}
+        .card p{margin:0 0 14px; color:var(--muted); font-size:14px; line-height:1.6}
         .badge{
           display:inline-flex; align-items:center; gap:8px;
-          padding:6px 10px; border-radius:999px; background:var(--chip); border:1px solid var(--border);
-          color:#cfe9ff; font-weight:600; font-size:12px;
+          padding:6px 12px; border-radius:999px; background:var(--chip); border:1px solid var(--border);
+          color:#cfe9ff; font-weight:600; font-size:13px;
         }
         .dot{width:10px; height:10px; border-radius:50%; background:linear-gradient(180deg, #38bdf8, #2563eb)}
-        .id{margin-top:10px; font-size:12px; color:#9fb0c8}
+        .meta{margin-top:12px; font-size:12px; color:#9fb0c8}
     </style>
 </head>
 <body>
@@ -109,17 +110,18 @@
             <div class="brand">
                 <div class="logo" aria-hidden="true"></div>
                 <div>
-                    <h1>Catálogo público</h1>
-                    <p class="sub">Explore os carros disponíveis. Para gerenciar, acesse a área administrativa.</p>
+                    <h1>Catálogo de Cursos</h1>
+                    <p class="sub">Explore os cursos disponíveis. Para gerenciar, acesse a área administrativa.</p>
                 </div>
             </div>
             <div class="hero-links">
-                <a href="/admin/cars" title="Ir para a administração">/admin/cars</a>
+                <a href="/" title="Ir para o catálogo de carros">Catálogo de Carros</a>
+                <a href="/admin/courses" title="Ir para a administração">/admin/courses</a>
             </div>
         </div>
 
-        <form class="search" method="get" action="/">
-            <input name="q" th:value="${q}" placeholder="Buscar por nome ou cor..." />
+        <form class="search" method="get" action="/courses">
+            <input name="q" th:value="${q}" placeholder="Buscar por título ou descrição..." />
             <button class="btn" type="submit">Buscar</button>
         </form>
     </div>
@@ -129,13 +131,14 @@
     <p class="muted" th:if="${q}">Resultados para: <strong th:text="${q}">consulta</strong></p>
 
     <div class="grid">
-        <div class="card" th:each="c : ${cars}">
-            <h3 th:text="${c.name}">Nome do carro</h3>
+        <div class="card" th:each="c : ${courses}">
+            <h3 th:text="${c.title}">Título do curso</h3>
+            <p th:text="${c.description}">Descrição do curso</p>
             <span class="badge">
-          <span class="dot" aria-hidden="true"></span>
-          <span th:text="${c.color}">Cor</span>
-        </span>
-            <p class="id" th:text="'ID: ' + ${c.id}">ID: 1</p>
+                <span class="dot" aria-hidden="true"></span>
+                <span th:text="${c.durationHours} + ' horas'">40 horas</span>
+            </span>
+            <p class="meta" th:text="'ID: ' + ${c.id} + ' | Criado em: ' + ${#temporals.format(c.createdAt, 'dd/MM/yyyy HH:mm')}">ID: 1 | Criado em: 22/11/2025 10:00</p>
         </div>
     </div>
 </section>

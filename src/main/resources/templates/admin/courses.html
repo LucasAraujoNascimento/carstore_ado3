@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CarStore — Administração</title>
+    <title>Cursos — Administração</title>
     <style>
         :root{
           --bg: #0b1020;
@@ -58,6 +58,7 @@
           background:conic-gradient(from 180deg, var(--primary), #22c55e, #a855f7, var(--primary));
           box-shadow:0 0 12px rgba(59,130,246,.8);
         }
+        .nav-links{display:flex; gap:16px; align-items:center}
         .link{
           color:var(--muted); text-decoration:none; font-size:14px;
         }
@@ -65,7 +66,7 @@
 
         .content{
           max-width:1100px; margin:28px auto; padding:0 20px 40px;
-          display:grid; grid-template-columns: 360px 1fr; gap:22px;
+          display:grid; grid-template-columns: 400px 1fr; gap:22px;
         }
         @media (max-width: 960px){
           .content{grid-template-columns: 1fr; gap:18px}
@@ -91,16 +92,21 @@
         .field{display:flex; flex-direction:column; gap:8px}
         .field + .field{margin-top:14px}
         .label{font-size:12px; color:var(--muted)}
-        input[type="text"]{
+        input[type="text"], input[type="number"], textarea{
           width:100%; padding:12px 12px;
           color:var(--text);
           background:#0c1329;
           border:1px solid var(--border);
           border-radius:10px;
           outline:none; transition:.15s border-color, .15s box-shadow;
+          font-family: inherit;
         }
-        input[type="text"]::placeholder{color:#6c7891}
-        input[type="text"]:focus{border-color:var(--primary); box-shadow:var(--focus)}
+        textarea{
+          min-height:80px;
+          resize:vertical;
+        }
+        input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder{color:#6c7891}
+        input[type="text"]:focus, input[type="number"]:focus, textarea:focus{border-color:var(--primary); box-shadow:var(--focus)}
 
         .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
         .btn{
@@ -154,14 +160,12 @@
         .dot-sm{width:8px;height:8px;border-radius:50%}
         .dot-blue{background:#60a5fa}
         .dot-gray{background:#94a3b8}
-
-        .footer{
-          max-width:1100px; margin:18px auto 40px; padding:0 20px;
-          color:var(--muted); font-size:13px;
+        
+        .logout-btn{
+          background:transparent; color:var(--danger); border:1px solid var(--danger);
+          padding:8px 12px; border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;
         }
-        code{
-          background:#0c1329; border:1px solid var(--border); padding:2px 6px; border-radius:6px; color:#cfe0ff;
-        }
+        .logout-btn:hover{background:rgba(239,68,68,.1)}
     </style>
 </head>
 <body>
@@ -170,35 +174,46 @@
         <div class="topbar-inner">
             <div class="brand">
                 <span class="dot" aria-hidden="true"></span>
-                <span>CarStore Admin</span>
+                <span>Admin - Cursos</span>
             </div>
-            <a class="link" href="/" title="Ir para o catálogo público">Catálogo público</a>
+            <div class="nav-links">
+                <a class="link" href="/admin/cars" title="Gerenciar carros">Carros</a>
+                <a class="link" href="/courses" title="Ir para o catálogo público de cursos">Cursos Públicos</a>
+                <form th:action="@{/logout}" method="post" style="margin:0">
+                    <button class="logout-btn" type="submit">Sair</button>
+                </form>
+            </div>
         </div>
     </header>
 
     <main class="content">
-        <!-- Painel: Novo carro -->
+        <!-- Painel: Novo curso -->
         <section class="panel">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Cadastrar novo carro</h2>
-                    <p class="panel-sub">Insira as informações e salve para adicionar ao catálogo.</p>
+                    <h2 class="panel-title">Cadastrar novo curso</h2>
+                    <p class="panel-sub">Preencha os campos para adicionar ao catálogo.</p>
                 </div>
             </div>
             <div class="panel-body">
-                <form th:action="@{/admin/cars}" method="post" th:object="${form}">
+                <form th:action="@{/admin/courses}" method="post" th:object="${form}">
                     <div class="field">
-                        <label class="label" for="name">Nome do modelo</label>
-                        <input id="name" th:field="*{name}" placeholder="Ex.: Civic, Gol, Uno..." />
-                        <div class="hint" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        <label class="label" for="title">Título do curso</label>
+                        <input id="title" th:field="*{title}" placeholder="Ex.: Spring Boot Avançado" />
+                        <div class="hint" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
                     </div>
                     <div class="field">
-                        <label class="label" for="color">Cor</label>
-                        <input id="color" th:field="*{color}" placeholder="Ex.: Prata, Preto, Azul..." />
-                        <div class="hint" th:if="${#fields.hasErrors('color')}" th:errors="*{color}"></div>
+                        <label class="label" for="description">Descrição</label>
+                        <textarea id="description" th:field="*{description}" placeholder="Descrição do curso..."></textarea>
+                        <div class="hint" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="durationHours">Duração (horas)</label>
+                        <input id="durationHours" type="number" th:field="*{durationHours}" placeholder="Ex.: 40" />
+                        <div class="hint" th:if="${#fields.hasErrors('durationHours')}" th:errors="*{durationHours}"></div>
                     </div>
                     <div class="actions">
-                        <button class="btn btn-primary" type="submit">Salvar carro</button>
+                        <button class="btn btn-primary" type="submit">Salvar curso</button>
                         <button class="btn btn-ghost" type="reset">Limpar</button>
                     </div>
                 </form>
@@ -209,40 +224,44 @@
         <section class="panel" style="overflow:hidden">
             <div class="panel-header">
                 <div>
-                    <h2 class="panel-title">Inventário de carros</h2>
+                    <h2 class="panel-title">Cursos cadastrados</h2>
                     <p class="panel-sub">Gerencie os registros existentes.</p>
                 </div>
-                <span class="chip"><span class="dot-sm dot-blue"></span> Total: <span th:text="${#lists.size(cars)}">0</span></span>
+                <span class="chip"><span class="dot-sm dot-blue"></span> Total: <span th:text="${#lists.size(courses)}">0</span></span>
             </div>
 
             <div class="table-wrap">
                 <table>
                     <thead>
                     <tr>
-                        <th style="width:90px">ID</th>
-                        <th>Nome</th>
-                        <th style="width:220px">Cor</th>
+                        <th style="width:70px">ID</th>
+                        <th>Título</th>
+                        <th>Descrição</th>
+                        <th style="width:100px">Duração (h)</th>
                         <th style="width:280px">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="c : ${cars}">
+                    <tr th:each="c : ${courses}">
                         <td>
                             <span class="chip"><span class="dot-sm dot-gray"></span><span th:text="${c.id}">1</span></span>
                         </td>
                         <td>
-                            <form class="inline" th:action="@{/admin/cars/{id}/update(id=${c.id})}" method="post">
-                                <input type="text" name="name" th:value="${c.name}" placeholder="Nome do carro" />
+                            <form class="inline" th:action="@{/admin/courses/{id}/update(id=${c.id})}" method="post">
+                                <input type="text" name="title" th:value="${c.title}" placeholder="Título" />
                         </td>
                         <td>
-                            <input type="text" name="color" th:value="${c.color}" placeholder="Cor" />
+                            <input type="text" name="description" th:value="${c.description}" placeholder="Descrição" />
+                        </td>
+                        <td>
+                            <input type="number" name="durationHours" th:value="${c.durationHours}" placeholder="Horas" />
                         </td>
                         <td>
                             <div class="row-controls">
                                 <button class="btn btn-warning" type="submit" title="Atualizar registro">Atualizar</button>
                             </div>
                             </form>
-                            <form class="inline" th:action="@{/admin/cars/{id}/delete(id=${c.id})}" method="post" onsubmit="return confirm('Confirmar exclusão?');" style="margin-left:8px">
+                            <form class="inline" th:action="@{/admin/courses/{id}/delete(id=${c.id})}" method="post" onsubmit="return confirm('Confirmar exclusão?');" style="margin-left:8px">
                                 <button class="btn btn-danger" type="submit" title="Excluir registro">Excluir</button>
                             </form>
                         </td>
